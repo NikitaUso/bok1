@@ -1182,6 +1182,8 @@ const allCards = [
 
 const currentIndex = ref(0)
 const isFlipped = ref(false)
+// Toggle to hide/show flashcards UI; keep data in code but render nothing when false
+const showFlashcards = ref(false)
 
 // Vi ändrar filteredCards till en ref (istället för computed) så vi kan spara den blandade ordningen
 const filteredCards = ref([])
@@ -1330,7 +1332,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flashcard-wrapper">
+  <div v-if="showFlashcards" class="flashcard-wrapper">
     <div class="mode-selector-container">
       <label for="chapter-select">Välj kapitel:</label>
       <select id="chapter-select" v-model="currentMode">

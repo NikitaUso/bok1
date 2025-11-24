@@ -12,8 +12,6 @@ const modes = [
   { id: 'kap3', label: 'Kap 3' },
   { id: 'kap4', label: 'Kap 4' },
   { id: 'kap5', label: 'Kap 5' },
-  { id: 'kap6', label: 'Kap 6' },
-  { id: 'kap7', label: 'Kap 7' },
   { id: 'kap6_7', label: 'Kap 6-7' },
 ]
 
@@ -43,7 +41,7 @@ function updateAndShuffleCards() {
 
   let selected = all.filter((c) => {
     if (mode === 'all') return true
-    if (mode === 'kap6_7') return c.category === 'kap6' || c.category === 'kap7'
+    if (mode === 'kap6_7') return ['kap6_7', 'kap6', 'kap7'].includes(c.category)
     return c.category === mode
   })
 

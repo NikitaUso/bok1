@@ -3,6 +3,7 @@ import FlashcardsView from '../views/FlashcardsView.vue'
 import ViewTwo from '../views/ViewTwo.vue'
 import ViewThree from '../views/ViewThree.vue'
 import ViewFour from '../views/ViewFour.vue'
+import FormlerView from '../views/FormlerView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/fyra',
       name: 'four',
       component: ViewFour,
+    },
+    {
+      path: '/formler',
+      name: 'formler',
+      component: FormlerView,
     },
   ],
 })

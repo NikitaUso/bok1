@@ -1,5 +1,32 @@
 <script setup>
 defineOptions({ name: 'FormlerView' })
+import FormulaLine from '../components/FormulaLine.vue'
+
+const resultLeft = [{ id: 'res', text: 'Resultat', sign: '' }]
+const resultRight = [
+  { id: 'int', text: 'Intäkter', sign: '+' },
+  { id: 'kost', text: 'Kostnader', sign: '-' },
+]
+
+const balansLeft = [{ id: 'till', text: 'Tillgångar', sign: '' }]
+const balansRight = [
+  { id: 'ek', text: 'Eget kapital', sign: '+' },
+  { id: 'sk', text: 'Skulder', sign: '+' },
+]
+
+const kfLeft = [{ id: 'kf', text: 'Kassaflöde', sign: '' }]
+const kfRight = [
+  { id: 'inb', text: 'Inbetalningar', sign: '+' },
+  { id: 'utb', text: 'Utbetalningar', sign: '-' },
+]
+
+const ekLeft = [{ id: 'ekub', text: 'Eget kapital (UB)', sign: '' }]
+const ekRight = [
+  { id: 'ekib', text: 'Eget kapital (IB)', sign: '+' },
+  { id: 'res2', text: 'Periodens resultat', sign: '+' },
+  { id: 'utd', text: 'Utdelning', sign: '-' },
+  { id: 'ny', text: 'Nyemission', sign: '+' },
+]
 </script>
 
 <template>
@@ -9,13 +36,13 @@ defineOptions({ name: 'FormlerView' })
     <section>
       <h2>Grundläggande Rapporter</h2>
       <h3>Resultaträkning</h3>
-      <pre>Resultat = Intäkter - Kostnader</pre>
+      <FormulaLine :left="resultLeft" :right="resultRight" />
 
       <h3>Balansräkning</h3>
-      <pre>Tillgångar = Eget kapital + Skulder</pre>
+      <FormulaLine :left="balansLeft" :right="balansRight" />
 
       <h3>Kassaflöde (Grund)</h3>
-      <pre>Kassaflöde = Inbetalningar - Utbetalningar</pre>
+      <FormulaLine :left="kfLeft" :right="kfRight" />
     </section>
 
     <section>

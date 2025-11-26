@@ -53,21 +53,13 @@ function onClick(id, side) {
   const all = [...state.leftList, ...state.rightList]
   const clicked = all.find((x) => x.id === id)
   if (!clicked) return
-
-  // Build new lists: clicked stays on its current side, others move to opposite side
-  if (side === 'left') {
-    const newLeft = [{ ...clicked, displaySign: clicked.sign || '' }]
-    const others = all.filter((x) => x.id !== id)
-    const newRight = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
-    state.leftList = newLeft
-    state.rightList = newRight
-  } else {
-    const newRight = [{ ...clicked, displaySign: clicked.sign || '' }]
-    const others = all.filter((x) => x.id !== id)
-    const newLeft = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
-    state.leftList = newLeft
-    state.rightList = newRight
-  }
+  // New behavior: clicked term always moves to the LEFT side.
+  // Left will contain only the clicked term; right contains all others (with inverted signs).
+  const newLeft = [{ ...clicked, displaySign: clicked.sign || '' }]
+  const others = all.filter((x) => x.id !== id)
+  const newRight = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
+  state.leftList = newLeft
+  state.rightList = newRight
 }
 
 const { leftList, rightList } = toRefs(state)

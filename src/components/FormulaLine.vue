@@ -55,7 +55,7 @@ function onClick(id, side) {
   if (!clicked) return
   // New behavior: clicked term always moves to the LEFT side.
   // Left will contain only the clicked term; right contains all others (with inverted signs).
-  const newLeft = [{ ...clicked, displaySign: clicked.sign || '' }]
+  const newLeft = [{ ...clicked, displaySign: '+' }]
   const others = all.filter((x) => x.id !== id)
   const newRight = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
   state.leftList = newLeft

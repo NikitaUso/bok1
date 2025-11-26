@@ -34,7 +34,6 @@ const pageTitle = computed(() => {
         <RouterLink to="/tva">T-konton</RouterLink>
         <RouterLink to="/tre">Quiz</RouterLink>
         <RouterLink to="/fyra">Räkna på rapporter och analyser</RouterLink>
-        <RouterLink to="/formler">Formler</RouterLink>
       </nav>
     </header>
 

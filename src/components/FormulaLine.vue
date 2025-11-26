@@ -32,13 +32,12 @@
 
 <script setup>
 import { reactive, toRefs } from 'vue'
-defineProps({
+
+// Define props once and use them
+const props = defineProps({
   left: { type: Array, required: true },
   right: { type: Array, required: true },
 })
-
-// Make local reactive copies
-const props = defineProps(['left', 'right'])
 const state = reactive({
   leftList: props.left.map((t) => ({ ...t, displaySign: t.sign })),
   rightList: props.right.map((t) => ({ ...t, displaySign: t.sign })),
@@ -57,13 +56,13 @@ function onClick(id, side) {
 
   // Build new lists: clicked stays on its current side, others move to opposite side
   if (side === 'left') {
-    const newLeft = [ { ...clicked, displaySign: clicked.sign || '' } ]
+    const newLeft = [{ ...clicked, displaySign: clicked.sign || '' }]
     const others = all.filter((x) => x.id !== id)
     const newRight = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
     state.leftList = newLeft
     state.rightList = newRight
   } else {
-    const newRight = [ { ...clicked, displaySign: clicked.sign || '' } ]
+    const newRight = [{ ...clicked, displaySign: clicked.sign || '' }]
     const others = all.filter((x) => x.id !== id)
     const newLeft = others.map((o) => ({ ...o, displaySign: invertSign(o.sign) }))
     state.leftList = newLeft
@@ -101,12 +100,23 @@ const { leftList, rightList } = toRefs(state)
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: transform 520ms cubic-bezier(.2,.9,.2,1), background 220ms;
+  transition:
+    transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    background 220ms;
 }
-.term:hover { background: #d7ecff }
-.sign { font-weight: 700; color: #333 }
-.text { font-weight: 600 }
+.term:hover {
+  background: #d7ecff;
+}
+.sign {
+  font-weight: 700;
+  color: #333;
+}
+.text {
+  font-weight: 600;
+}
 
 /* transition-group move animation */
-.term-move { transition: transform 520ms cubic-bezier(.2,.9,.2,1); }
+.term-move {
+  transition: transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
 </style>

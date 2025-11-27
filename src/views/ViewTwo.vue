@@ -1220,18 +1220,26 @@ function checkAnswer() {
       if (exId && !pendingGroup.value.includes(exId)) pendingGroup.value.push(exId)
 
       // save user's answers for this exercise so we can restore when navigating back
-      if (exId) userAnswersById.value[exId] = JSON.parse(JSON.stringify(userAccounts.value))
+      if (exId) {
+        userAnswersById.value[exId] = JSON.parse(JSON.stringify(userAccounts.value))
+        console.log(`[Chain] Saved answers for exercise ${exId}:`, userAnswersById.value[exId])
+      }
 
       // find index of next in current order
       const nextIdx = exerciseOrder.value.findIndex((e) => e.id === ex.next)
       if (nextIdx >= 0) {
+        console.log(`[Chain] Moving from ${exId} to next ${ex.next} (index ${nextIdx})`)
         currentExerciseIndex.value = nextIdx
         feedbackMessage.value = 'Fortsätt följdfrågan...'
+        feedbackType.value = ''
         // if we have saved answers for the next exercise, restore them
         const nextId = ex.next
         const saved = userAnswersById.value && userAnswersById.value[nextId]
         if (saved) {
+          console.log(`[Chain] Restoring saved answers for ${nextId}:`, saved)
           userAccounts.value = JSON.parse(JSON.stringify(saved))
+        } else {
+          console.log(`[Chain] No saved answers for ${nextId}, keeping current workspace`)
         }
       }
       // persist
@@ -1282,18 +1290,33 @@ function nextExercise() {
 
 // Gå till föregående uppgift
 function prevExercise() {
-  // If current exercise is part of a chain, and has a predecessor, go to predecessor and restore its answers
-  const ex = currentExercise.value
-  if (ex && ex.id) {
+  // Save current exercise answers before navigating away (if in a chain)
+  const currentEx = currentExercise.value
+  if (currentEx && currentEx.id) {
+    const chainIds = getChainIdsFor(currentEx.id)
+    // if current is in a multi-step chain, save its state
+    if (chainIds && chainIds.length > 1) {
+      console.log(`[Prev] Current exercise ${currentEx.id} is in chain:`, chainIds)
+      userAnswersById.value[currentEx.id] = JSON.parse(JSON.stringify(userAccounts.value))
+      console.log(`[Prev] Saved current answers for ${currentEx.id}:`, userAnswersById.value[currentEx.id])
+    }
+
     const predMap = getPredecessorMap()
-    const predId = predMap.get(ex.id)
+    const predId = predMap.get(currentEx.id)
     if (predId) {
       const predIdx = exerciseOrder.value.findIndex((e) => e.id === predId)
       if (predIdx >= 0) {
+        console.log(`[Prev] Moving from ${currentEx.id} back to predecessor ${predId} (index ${predIdx})`)
         currentExerciseIndex.value = predIdx
         // restore saved answers if present
         const saved = userAnswersById.value && userAnswersById.value[predId]
-        userAccounts.value = saved ? JSON.parse(JSON.stringify(saved)) : []
+        if (saved) {
+          console.log(`[Prev] Restoring saved answers for ${predId}:`, saved)
+          userAccounts.value = JSON.parse(JSON.stringify(saved))
+        } else {
+          console.log(`[Prev] No saved answers for ${predId}, clearing workspace`)
+          userAccounts.value = []
+        }
         feedbackMessage.value = ''
         feedbackType.value = ''
         saveViewTwoState()
@@ -1302,7 +1325,8 @@ function prevExercise() {
     }
   }
 
-  // default: step back normally
+  // default: step back normally (not in a chain)
+  console.log(`[Prev] No chain predecessor, stepping back normally from index ${currentExerciseIndex.value}`)
   if (currentExerciseIndex.value > 0) {
     currentExerciseIndex.value--
   } else {

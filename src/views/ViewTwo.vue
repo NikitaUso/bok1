@@ -53,6 +53,8 @@ const exercises = [
       { code: '2610', side: 'kredit', amount: 25000 },
       { code: '1510', side: 'debet', amount: 125000 },
     ],
+    // följdfråga: betalning från kund
+    next: 3,
   },
   {
     id: 2,
@@ -1000,6 +1002,9 @@ const feedbackType = ref('') // 'success' eller 'error'
 // Track completed (corrected) exercises by id
 const completedExercises = ref([])
 
+// Pending group of linked exercises: ids that are answered in a chain but the chain hasn't finished yet
+const pendingGroup = ref([])
+
 // ORDER: exercises can be shuffled; exerciseOrder holds the current ordering
 const exerciseOrder = ref([...exercises])
 
@@ -1056,6 +1061,7 @@ function saveViewTwoState() {
       userAccounts: userAccounts.value,
       order: exerciseOrder.value.map((e) => e.id),
       completed: completedExercises.value,
+      pendingGroup: pendingGroup.value,
     }
     localStorage.setItem(key, JSON.stringify(payload))
   } catch (e) {
@@ -1086,6 +1092,7 @@ function loadViewTwoState() {
         currentExerciseIndex.value = Math.min(parsed.index || 0, exerciseOrder.value.length - 1)
         userAccounts.value = parsed.userAccounts || []
         completedExercises.value = parsed.completed || []
+        pendingGroup.value = parsed.pendingGroup || []
       }
     }
   } catch (e) {
@@ -1152,14 +1159,43 @@ function checkAnswer() {
 
   if (allCorrect) {
     feedbackType.value = 'success'
-    feedbackMessage.value = 'Helt rätt! Bra jobbat! 🎉'
-    // Mark this exercise as completed
-    const exId = currentExercise.value && currentExercise.value.id
-    if (exId && !completedExercises.value.includes(exId)) {
-      completedExercises.value.push(exId)
+    feedbackMessage.value = 'Helt rätt! 🎉'
+
+    const ex = currentExercise.value
+    const exId = ex && ex.id
+
+    // If this exercise has a linked next that is not yet completed, keep answers
+    // and move to the next linked exercise without clearing the workspace.
+    if (ex && ex.next && !completedExercises.value.includes(ex.next)) {
+      // add current to pending group
+      if (exId && !pendingGroup.value.includes(exId)) pendingGroup.value.push(exId)
+
+      // find index of next in current order
+      const nextIdx = exerciseOrder.value.findIndex((e) => e.id === ex.next)
+      if (nextIdx >= 0) {
+        currentExerciseIndex.value = nextIdx
+        feedbackMessage.value = 'Fortsätt följdfrågan...'
+      }
+      // persist
+      saveViewTwoState()
+      return
     }
-    // persist
+
+    // If there's no next (or next already completed), this ends a chain.
+    // Mark this and any pending group ids as completed.
+    const toMark = []
+    if (pendingGroup.value.length) toMark.push(...pendingGroup.value)
+    if (exId) toMark.push(exId)
+    toMark.forEach((id) => {
+      if (!completedExercises.value.includes(id)) completedExercises.value.push(id)
+    })
+
+    // clear pending group and workspace, then advance to next exercise
+    pendingGroup.value = []
+    userAccounts.value = []
     saveViewTwoState()
+    // Move forward normally
+    nextExercise()
   } else {
     feedbackType.value = 'error'
     feedbackMessage.value = 'Tyvärr, fel konton eller belopp. Försök igen!'

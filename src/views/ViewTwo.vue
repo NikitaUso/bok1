@@ -183,6 +183,372 @@ const scenarioList = [
       },
     ],
   },
+  // --- KEDJA: Tjänsteförsäljning ---
+  {
+    id: 'chain-service-1',
+    title: 'Konsultuppdrag',
+    steps: [
+      {
+        stepTitle: 'Del 1: Utförande och fakturering',
+        text: 'Du har utfört konsulttjänster åt en kund och skickar en faktura på 20 000 kr + moms (5 000 kr).',
+        solution: [
+          { code: '3041', side: 'kredit', amount: 20000 }, // Tjänsteintäkt
+          { code: '2610', side: 'kredit', amount: 5000 }, // Utgående moms
+          { code: '1510', side: 'debet', amount: 25000 }, // Kundfordran
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Kunden betalar',
+        text: 'Kunden betalar fakturan på 25 000 kr till ditt företagskonto.',
+        solution: [
+          { code: '1930', side: 'debet', amount: 25000 },
+          { code: '1510', side: 'kredit', amount: 25000 },
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Kontantinköp ---
+  {
+    id: 'single-cash-purchase',
+    title: 'Kontantinköp till kontoret',
+    steps: [
+      {
+        stepTitle: 'Inköp med kvitto',
+        text: 'Du köper toner och papper (förbrukningsinventarier) i en butik och betalar kontant. Pris: 800 kr + moms (200 kr).',
+        solution: [
+          { code: '5400', side: 'debet', amount: 800 }, // Kostnad
+          { code: '2640', side: 'debet', amount: 200 }, // Ingående moms
+          { code: '1910', side: 'kredit', amount: 1000 }, // Pengar ur kassan
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Momsbetalning ---
+  {
+    id: 'single-vat-payment',
+    title: 'Momsredovisning',
+    steps: [
+      {
+        stepTitle: 'Betalning till Skatteverket',
+        text: 'Dags att betala moms! Du har 30 000 kr i utgående moms (skuld) och 10 000 kr i ingående moms (fordran). Mellanskillnaden (20 000 kr) dras från företagskontot.',
+        solution: [
+          { code: '2610', side: 'debet', amount: 30000 }, // Nolla skulden
+          { code: '2640', side: 'kredit', amount: 10000 }, // Nolla fordran
+          { code: '1930', side: 'kredit', amount: 20000 }, // Betala skillnaden
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Checkkredit ---
+  {
+    id: 'single-overdraft',
+    title: 'Ansträngd likviditet',
+    steps: [
+      {
+        stepTitle: 'Inköp via checkkredit',
+        text: 'Företagskontot är tomt, men du måste köpa in varor för 10 000 kr + moms (2 500 kr). Du betalar genom att utnyttja din checkräkningskredit (ökar skulden till banken).',
+        solution: [
+          { code: '4010', side: 'debet', amount: 10000 },
+          { code: '2640', side: 'debet', amount: 2500 },
+          { code: '2330', side: 'kredit', amount: 12500 }, // Skuldkonto
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Avskrivning ---
+  {
+    id: 'single-depreciation',
+    title: 'Bokslut: Avskrivning',
+    steps: [
+      {
+        stepTitle: 'Värdeminskning inventarier',
+        text: 'Vid årets slut görs en avskrivning på företagets inventarier för att spegla värdeminskningen. Belopp: 15 000 kr.',
+        solution: [
+          { code: '7810', side: 'debet', amount: 15000 }, // Kostnad
+          { code: '1220', side: 'kredit', amount: 15000 }, // Tillgången minskar i värde
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Ränteintäkt ---
+  {
+    id: 'single-interest-income',
+    title: 'Bankränta',
+    steps: [
+      {
+        stepTitle: 'Ränta på kontot',
+        text: 'Banken sätter in 500 kr i ränta på ditt företagskonto (en finansiell intäkt).',
+        solution: [
+          { code: '1930', side: 'debet', amount: 500 }, // Pengar in
+          { code: '8310', side: 'kredit', amount: 500 }, // Intäkt
+        ],
+      },
+    ],
+  },
+
+  // --- KEDJA: Förskottsbetalning (Enkel) ---
+  {
+    id: 'chain-prepaid',
+    title: 'Förskott från kund',
+    steps: [
+      {
+        stepTitle: 'Del 1: Mottagande av pengar',
+        text: 'En kund betalar 10 000 kr i förskott för ett jobb du ska göra nästa månad. Du har inte fakturerat än, så detta är en skuld till kunden.',
+        solution: [
+          { code: '1930', side: 'debet', amount: 10000 },
+          { code: '2391', side: 'kredit', amount: 10000 }, // Förutbetalda intäkter (Skuld)
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Jobbet utförs',
+        text: 'Nu är jobbet klart! Vi omvandlar skulden till en intäkt (vi bortser från moms i just detta exempel för enkelhets skull).',
+        solution: [
+          { code: '2391', side: 'debet', amount: 10000 }, // Skulden försvinner
+          { code: '3041', side: 'kredit', amount: 10000 }, // Blir tjänsteintäkt
+        ],
+      },
+    ],
+  },
+  // --- KEDJA: Inköp av bil med lån och kontantinsats ---
+  // Detta är ett "sammansatt verifikat" där vi krediterar två olika konton.
+  {
+    id: 'chain-car-purchase',
+    title: 'Inköp av företagsbil',
+    steps: [
+      {
+        stepTitle: 'Del 1: Köpet',
+        text: 'Företaget köper en lätt lastbil för 200 000 kr + moms (50 000 kr). Vi betalar 100 000 kr direkt från företagskontot (kontantinsats) och resten finansieras via ett nytt banklån.',
+        solution: [
+          { code: '1240', side: 'debet', amount: 200000 }, // Tillgången ökar
+          { code: '2640', side: 'debet', amount: 50000 }, // Ingående moms
+          { code: '1930', side: 'kredit', amount: 100000 }, // Pengar ut (kontantinsats)
+          { code: '2350', side: 'kredit', amount: 150000 }, // Banklånet ökar (resterande belopp)
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Avskrivning',
+        text: 'Vid årets slut gör vi en avskrivning på bilen med 20 000 kr.',
+        solution: [
+          { code: '7810', side: 'debet', amount: 20000 }, // Kostnad
+          { code: '1240', side: 'kredit', amount: 20000 }, // Värdet på bilen minskar
+        ],
+      },
+    ],
+  },
+
+  // --- KEDJA: Leverantörsretur och slutbetalning ---
+  {
+    id: 'chain-supplier-return',
+    title: 'Retur av varor',
+    steps: [
+      {
+        stepTitle: 'Del 1: Inköpet',
+        text: 'Vi köper in ett stort parti varor på faktura: 80 000 kr + moms (20 000 kr).',
+        solution: [
+          { code: '4010', side: 'debet', amount: 80000 },
+          { code: '2640', side: 'debet', amount: 20000 },
+          { code: '2440', side: 'kredit', amount: 100000 },
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Returen',
+        text: 'En del av varorna var trasiga. Vi skickar tillbaka varor värda 10 000 kr + moms (2 500 kr) och får en kreditfaktura från leverantören.',
+        solution: [
+          { code: '2440', side: 'debet', amount: 12500 }, // Skulden minskar
+          { code: '4010', side: 'kredit', amount: 10000 }, // Kostnaden minskar
+          { code: '2640', side: 'kredit', amount: 2500 }, // Momsen korrigeras
+        ],
+      },
+      {
+        stepTitle: 'Del 3: Slutbetalning',
+        text: 'Vi betalar det som är kvar av skulden till leverantören via företagskontot. (Ursprunglig skuld 100 000 kr minus retur 12 500 kr = 87 500 kr).',
+        solution: [
+          { code: '2440', side: 'debet', amount: 87500 },
+          { code: '1930', side: 'kredit', amount: 87500 },
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Rättelse (Omföring) ---
+  {
+    id: 'single-correction',
+    title: 'Rättelse av felbokning',
+    steps: [
+      {
+        stepTitle: 'Flytta från inventarier till förbrukning',
+        text: 'Vi upptäcker ett fel. Vi har tidigare bokfört en datorstol för 5 000 kr på konto 1220 (Inventarier), men eftersom den var så billig ska den bokföras som en direkt kostnad (Förbrukningsinventarier). Gör en omföring.',
+        solution: [
+          { code: '5400', side: 'debet', amount: 5000 }, // Öka kostnaden
+          { code: '1220', side: 'kredit', amount: 5000 }, // Minska tillgången
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Löneutbetalning via Checkkredit ---
+  {
+    id: 'single-salary-overdraft',
+    title: 'Lön när kassan är tom',
+    steps: [
+      {
+        stepTitle: 'Lön via kredit',
+        text: 'Det är löning men kontot är tomt. Bruttolön 40 000 kr, skatt 12 000 kr. Nettolönen (28 000 kr) betalas ut genom att belasta checkräkningskrediten.',
+        solution: [
+          { code: '7010', side: 'debet', amount: 40000 }, // Kostnad bruttolön
+          { code: '2710', side: 'kredit', amount: 12000 }, // Skuld personalskatt
+          { code: '2330', side: 'kredit', amount: 28000 }, // Skuld till banken ökar (istället för 1930)
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Försäljning av inventarier (Vinst) ---
+  {
+    id: 'single-asset-sale',
+    title: 'Försäljning av gammal inventarie',
+    steps: [
+      {
+        stepTitle: 'Sälja gamla möbler',
+        text: 'Vi säljer gamla kontorsmöbler som vi inte längre behöver. Vi får 4 000 kr + moms (1 000 kr) insatt på företagskontot. Vi bokför försäljningen som "Övriga intäkter".',
+        solution: [
+          { code: '1930', side: 'debet', amount: 5000 },
+          { code: '3900', side: 'kredit', amount: 4000 }, // Intäkt
+          { code: '2610', side: 'kredit', amount: 1000 }, // Utgående moms
+        ],
+      },
+    ],
+  },
+  // --- KEDJA: Blandad försäljning (Varor + Tjänst) ---
+  {
+    id: 'chain-mixed-sales',
+    title: 'Stororder till kund',
+    steps: [
+      {
+        stepTitle: 'Del 1: Fakturering',
+        text: 'Vi säljer både hårdvara och installation till en kund. Varor för 50 000 kr och arbete (tjänst) för 10 000 kr. Moms 25% på allt (15 000 kr totalt). Fakturan skickas.',
+        solution: [
+          { code: '3001', side: 'kredit', amount: 50000 }, // Varuförsäljning
+          { code: '3041', side: 'kredit', amount: 10000 }, // Tjänsteförsäljning
+          { code: '2610', side: 'kredit', amount: 15000 }, // Total moms
+          { code: '1510', side: 'debet', amount: 75000 }, // Total fordran
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Inbetalning',
+        text: 'Kunden betalar hela fakturan på 75 000 kr till företagskontot.',
+        solution: [
+          { code: '1930', side: 'debet', amount: 75000 },
+          { code: '1510', side: 'kredit', amount: 75000 },
+        ],
+      },
+    ],
+  },
+
+  // --- KEDJA: Konstaterad kundförlust ---
+  {
+    id: 'chain-bad-debt',
+    title: 'Kundförlust',
+    steps: [
+      {
+        stepTitle: 'Del 1: Fakturera kund',
+        text: 'Du skickar en faktura på 8 000 kr + moms (2 000 kr). Kunden har ont om pengar.',
+        solution: [
+          { code: '3001', side: 'kredit', amount: 8000 },
+          { code: '2610', side: 'kredit', amount: 2000 },
+          { code: '1510', side: 'debet', amount: 10000 },
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Konkurs',
+        text: 'Det visar sig att kunden gått i konkurs och inte kan betala en krona. Vi måste skriva bort fordran. (Vi använder konto 6990 som kostnadskonto för förlusten här).',
+        solution: [
+          { code: '1510', side: 'kredit', amount: 10000 }, // Fordran försvinner
+          { code: '6990', side: 'debet', amount: 8000 }, // Förlusten (kostnad)
+          { code: '2610', side: 'debet', amount: 2000 }, // Vi får tillbaka momsen från staten
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Aktieägartillskott ---
+  {
+    id: 'single-shareholder-contribution',
+    title: 'Kapitaltillskott',
+    steps: [
+      {
+        stepTitle: 'Ägaren skjuter till pengar',
+        text: 'Likviditeten är dålig, så ägaren sätter in 150 000 kr av privata pengar på företagskontot. Detta bokförs som ett tillskott (ökar Eget Kapital).',
+        solution: [
+          { code: '1930', side: 'debet', amount: 150000 },
+          { code: '2081', side: 'kredit', amount: 150000 },
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Betalning av räntekostnad ---
+  {
+    id: 'single-interest-payment',
+    title: 'Betala ränta',
+    steps: [
+      {
+        stepTitle: 'Kvartalsränta',
+        text: 'Banken drar ränta för kvartalet direkt från företagskontot. Beloppet är 3 500 kr.',
+        solution: [
+          { code: '8410', side: 'debet', amount: 3500 }, // Räntekostnad
+          { code: '1930', side: 'kredit', amount: 3500 }, // Pengar ut
+        ],
+      },
+    ],
+  },
+
+  // --- FRISTÅENDE: Inköp av marknadsföring ---
+  {
+    id: 'single-marketing',
+    title: 'Reklamkampanj',
+    steps: [
+      {
+        stepTitle: 'Faktura för reklam',
+        text: 'Vi har köpt annonsplats i en tidning. Fakturan är på 15 000 kr + moms (3 750 kr). Vi använder kontot för "Övriga externa kostnader".',
+        solution: [
+          { code: '6990', side: 'debet', amount: 15000 },
+          { code: '2640', side: 'debet', amount: 3750 },
+          { code: '2440', side: 'kredit', amount: 18750 },
+        ],
+      },
+    ],
+  },
+
+  // --- KEDJA: Lån och delbetalning av maskin ---
+  {
+    id: 'chain-machine-part-payment',
+    title: 'Maskininköp',
+    steps: [
+      {
+        stepTitle: 'Del 1: Inköp',
+        text: 'Vi köper en ny svarv (inventarie) för 60 000 kr + moms (15 000 kr) mot faktura.',
+        solution: [
+          { code: '1220', side: 'debet', amount: 60000 },
+          { code: '2640', side: 'debet', amount: 15000 },
+          { code: '2440', side: 'kredit', amount: 75000 },
+        ],
+      },
+      {
+        stepTitle: 'Del 2: Betalning',
+        text: 'Vi betalar fakturan genom att ta ett banklån som banken betalar direkt till leverantören (pengarna passerar inte vårt konto, men skulderna byter plats).',
+        solution: [
+          { code: '2440', side: 'debet', amount: 75000 }, // Lev.skuld försvinner
+          { code: '2350', side: 'kredit', amount: 75000 }, // Banklån uppstår
+        ],
+      },
+    ],
+  },
 ]
 
 // --- STATE ---

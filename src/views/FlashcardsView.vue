@@ -1,7 +1,6 @@
 <script setup>
 defineOptions({ name: 'FlashcardsView' })
 import { ref, computed, watch, onMounted } from 'vue'
-import set1 from '../data/flashcards_set1.js'
 import set2 from '../data/flashcards_set2.js'
 
 // Modes (kapitel + combined kap6_7)

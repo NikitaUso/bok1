@@ -2,6 +2,7 @@
 defineOptions({ name: 'TAccountView' })
 import { ref, computed, watch, onMounted } from 'vue'
 
+
 // --- KONTOPLAN (Referens) ---
 const accountList = [
   // TILLGÅNGAR (1xxx)
@@ -1005,6 +1006,50 @@ const completedExercises = ref([])
 // Pending group of linked exercises: ids that are answered in a chain but the chain hasn't finished yet
 const pendingGroup = ref([])
 
+// Helper: build predecessor map (id -> predecessorId) for quick chain traversal
+function getPredecessorMap() {
+  const map = new Map()
+  exercises.forEach((e) => {
+    if (e.next) map.set(e.next, e.id)
+  })
+  return map
+}
+
+// Given an exercise id, return the full chain of ids (root -> ... -> tail) that includes it
+function getChainIdsFor(id) {
+  if (!id) return []
+  const pred = getPredecessorMap()
+  // find root by walking predecessors
+  let root = id
+  while (pred.has(root)) {
+    root = pred.get(root)
+  }
+
+  // build chain from root following `next`
+  const mapById = new Map(exercises.map((e) => [e.id, e]))
+  const chain = []
+  let cur = root
+  const seen = new Set()
+  while (cur && !seen.has(cur)) {
+    seen.add(cur)
+    chain.push(cur)
+    const ex = mapById.get(cur)
+    if (!ex || !ex.next) break
+    cur = ex.next
+  }
+  return chain
+}
+
+// Computed info for current chain (index and total). Null if not part of multi-step chain.
+const chainInfo = computed(() => {
+  const ex = currentExercise.value
+  if (!ex) return null
+  const ids = getChainIdsFor(ex.id)
+  if (!ids || ids.length <= 1) return null
+  const idx = ids.indexOf(ex.id)
+  return { index: idx + 1, total: ids.length, ids }
+})
+
 // ORDER: exercises can be shuffled; exerciseOrder holds the current ordering
 const exerciseOrder = ref([...exercises])
 
@@ -1292,7 +1337,10 @@ watch(
     <div class="scenario-card">
       <div class="header-row">
         <h2>{{ currentExercise.title }}</h2>
-        <span class="progress">({{ currentExerciseIndex + 1 }} / {{ exercises.length }})</span>
+        <div style="display:flex; gap:12px; align-items:center">
+          <span class="progress">({{ currentExerciseIndex + 1 }} / {{ exercises.length }})</span>
+          <span v-if="chainInfo" class="chain-progress">Serie: {{ chainInfo.index }} / {{ chainInfo.total }}</span>
+        </div>
       </div>
       <p class="scenario-text">{{ currentExercise.text }}</p>
     </div>

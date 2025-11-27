@@ -2,7 +2,6 @@
 defineOptions({ name: 'TAccountView' })
 import { ref, computed, watch, onMounted } from 'vue'
 
-
 // --- KONTOPLAN (Referens) ---
 const accountList = [
   // TILLGÅNGAR (1xxx)
@@ -1006,6 +1005,9 @@ const completedExercises = ref([])
 // Pending group of linked exercises: ids that are answered in a chain but the chain hasn't finished yet
 const pendingGroup = ref([])
 
+// Store user answers per exercise id so we can restore when navigating back/forward in a chain
+const userAnswersById = ref({})
+
 // Helper: build predecessor map (id -> predecessorId) for quick chain traversal
 function getPredecessorMap() {
   const map = new Map()
@@ -1107,6 +1109,7 @@ function saveViewTwoState() {
       order: exerciseOrder.value.map((e) => e.id),
       completed: completedExercises.value,
       pendingGroup: pendingGroup.value,
+      userAnswersById: userAnswersById.value,
     }
     localStorage.setItem(key, JSON.stringify(payload))
   } catch (e) {
@@ -1138,6 +1141,7 @@ function loadViewTwoState() {
         userAccounts.value = parsed.userAccounts || []
         completedExercises.value = parsed.completed || []
         pendingGroup.value = parsed.pendingGroup || []
+        userAnswersById.value = parsed.userAnswersById || {}
       }
     }
   } catch (e) {
@@ -1215,11 +1219,20 @@ function checkAnswer() {
       // add current to pending group
       if (exId && !pendingGroup.value.includes(exId)) pendingGroup.value.push(exId)
 
+      // save user's answers for this exercise so we can restore when navigating back
+      if (exId) userAnswersById.value[exId] = JSON.parse(JSON.stringify(userAccounts.value))
+
       // find index of next in current order
       const nextIdx = exerciseOrder.value.findIndex((e) => e.id === ex.next)
       if (nextIdx >= 0) {
         currentExerciseIndex.value = nextIdx
         feedbackMessage.value = 'Fortsätt följdfrågan...'
+        // if we have saved answers for the next exercise, restore them
+        const nextId = ex.next
+        const saved = userAnswersById.value && userAnswersById.value[nextId]
+        if (saved) {
+          userAccounts.value = JSON.parse(JSON.stringify(saved))
+        }
       }
       // persist
       saveViewTwoState()
@@ -1236,6 +1249,11 @@ function checkAnswer() {
     })
 
     // clear pending group and workspace, then advance to next exercise
+    // remove saved answers for the finished chain
+    const toClear = toMark.slice()
+    toClear.forEach((id) => {
+      if (userAnswersById.value && userAnswersById.value[id]) delete userAnswersById.value[id]
+    })
     pendingGroup.value = []
     userAccounts.value = []
     saveViewTwoState()
@@ -1264,6 +1282,27 @@ function nextExercise() {
 
 // Gå till föregående uppgift
 function prevExercise() {
+  // If current exercise is part of a chain, and has a predecessor, go to predecessor and restore its answers
+  const ex = currentExercise.value
+  if (ex && ex.id) {
+    const predMap = getPredecessorMap()
+    const predId = predMap.get(ex.id)
+    if (predId) {
+      const predIdx = exerciseOrder.value.findIndex((e) => e.id === predId)
+      if (predIdx >= 0) {
+        currentExerciseIndex.value = predIdx
+        // restore saved answers if present
+        const saved = userAnswersById.value && userAnswersById.value[predId]
+        userAccounts.value = saved ? JSON.parse(JSON.stringify(saved)) : []
+        feedbackMessage.value = ''
+        feedbackType.value = ''
+        saveViewTwoState()
+        return
+      }
+    }
+  }
+
+  // default: step back normally
   if (currentExerciseIndex.value > 0) {
     currentExerciseIndex.value--
   } else {
@@ -1271,7 +1310,7 @@ function prevExercise() {
     currentExerciseIndex.value = Math.max(exercises.length - 1, 0)
   }
 
-  // Nollställ arbetsytan när vi byter uppgift
+  // Nollställ arbetsytan när vi byter uppgift (default behavior)
   userAccounts.value = []
   feedbackMessage.value = ''
   feedbackType.value = ''
@@ -1337,9 +1376,11 @@ watch(
     <div class="scenario-card">
       <div class="header-row">
         <h2>{{ currentExercise.title }}</h2>
-        <div style="display:flex; gap:12px; align-items:center">
+        <div style="display: flex; gap: 12px; align-items: center">
           <span class="progress">({{ currentExerciseIndex + 1 }} / {{ exercises.length }})</span>
-          <span v-if="chainInfo" class="chain-progress">Serie: {{ chainInfo.index }} / {{ chainInfo.total }}</span>
+          <span v-if="chainInfo" class="chain-progress"
+            >Serie: {{ chainInfo.index }} / {{ chainInfo.total }}</span
+          >
         </div>
       </div>
       <p class="scenario-text">{{ currentExercise.text }}</p>

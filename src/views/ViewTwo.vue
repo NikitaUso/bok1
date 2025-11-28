@@ -997,12 +997,13 @@ select {
   display: flex;
   padding: 10px;
   position: relative;
+  align-items: center;
 }
 .side {
   flex: 1;
-  padding: 0 5px;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 .side label {
   font-size: 0.7rem;
@@ -1022,7 +1023,8 @@ select {
 .divider {
   width: 1px;
   background: #34495e;
-  margin: -10px 0;
+  align-self: stretch;
+  margin: 0 8px;
 }
 
 /* TOTALS - NEUTRAL FÄRG */

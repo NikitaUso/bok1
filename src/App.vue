@@ -16,7 +16,7 @@ const pageTitle = computed(() => {
     case 'four':
       return 'Rapporter & analyser'
     default:
-      return 'EduAccount 🎓'
+      return 'AI'
   }
 })
 </script>
@@ -34,6 +34,7 @@ const pageTitle = computed(() => {
         <RouterLink to="/tva">T-konton</RouterLink>
         <RouterLink to="/tre">Quiz</RouterLink>
         <RouterLink to="/fyra">Räkna på rapporter och analyser</RouterLink>
+        <RouterLink to="/ai">AI-Skapare</RouterLink>
       </nav>
     </header>
 

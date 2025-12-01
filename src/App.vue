@@ -30,6 +30,9 @@ import { RouterLink, RouterView } from 'vue-router'
             >
             <RouterLink class="dropdown-item" to="/extra/vaxelkurser">Växelkurser</RouterLink>
             <RouterLink class="dropdown-item" to="/extra/periodisering">Periodisering</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/nettoforsaljningsvarde"
+              >Nettoförsäljningsvärde</RouterLink
+            >
           </div>
         </div>
       </nav>

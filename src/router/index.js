@@ -10,6 +10,7 @@ import RSyss from '@/views/RSyss.vue'
 import Expenses from '@/views/Expenses.vue'
 import PersonnelCosts from '@/views/PersonnelCosts.vue'
 import Accruals from '@/views/Accruals.vue'
+import NetRealizableValue from '@/views/NetRealizableValue.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +69,11 @@ const router = createRouter({
       path: '/extra/periodisering',
       name: 'accruals',
       component: Accruals,
+    },
+    {
+      path: '/extra/nettoforsaljningsvarde',
+      name: 'net-realizable',
+      component: NetRealizableValue,
     },
   ],
 })

@@ -48,7 +48,7 @@ function generateExercises() {
       let creditRate = 0
 
       let text = `Företaget ${isExport ? 'Exportera AB' : 'Importera AB'} ${isExport ? 'säljer' : 'köper'} varor i ${currency.name}. `
-      text += `Faktura på ${amountFC.toLocaleString()} ${currency.name} bokförs till kursen ${rate1} SEK/${currency.name}. `
+      text += `Faktura på ${amountFC.toLocaleString('sv-SE')} ${currency.name} bokförs till kursen ${rate1} SEK/${currency.name}. `
 
       if (hasCreditNote) {
         creditAmountFC = getRandomInt(1, 5) * 100 // Litet belopp
@@ -104,7 +104,7 @@ function generateExercises() {
       const depPerYear = acquisitionSEK / lifeYears
       const bookValue = acquisitionSEK - depPerYear * yearsPassed
 
-      const text = `Bolaget köper den 1 januari en maskin från USA för ${amountFC.toLocaleString()} ${currency.name}.
+      const text = `Bolaget köper den 1 januari en maskin från USA för ${amountFC.toLocaleString('sv-SE')} ${currency.name}.
                     Växelkursen vid köpet var ${rate1} SEK/${currency.name}. Maskinen skrivs av på ${lifeYears} år.
                     <br>På bokslutsdagen 31 december är kursen ${rate2} SEK/${currency.name}.`
 

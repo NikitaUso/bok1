@@ -20,7 +20,7 @@ function generateExercises() {
   const rentPerMonth = (Math.floor(Math.random() * 10) + 5) * 1000 // 5k - 15k
   newExercises.push({
     title: 'Kvartalshyra i förskott',
-    text: `Företaget betalar lokalhyra kvartalsvis i förskott. Den 28 december ${currentYear} betalades fakturan för perioden januari–mars År 2 på totalt ${(rentPerMonth * 3).toLocaleString()} kr.`,
+    text: `Företaget betalar lokalhyra kvartalsvis i förskott. Den 28 december ${currentYear} betalades fakturan för perioden januari–mars År 2 på totalt ${(rentPerMonth * 3).toLocaleString('sv-SE')} kr.`,
     question: `Hur stor är hyreskostnaden för ${currentYear} som ska redovisas i resultaträkningen?`,
     answer: 0, // Ingen kostnad detta år, allt är förskott
     explanation: `Eftersom hyran avser nästa år (jan-mars År 2) är kostnaden för År 1 <strong>0 kr</strong>. Hela beloppet bokförs som en förutbetald kostnad (tillgång).`,
@@ -32,10 +32,10 @@ function generateExercises() {
   const insuranceMonthly = insuranceYearly / 12
   newExercises.push({
     title: 'Företagsförsäkring',
-    text: `Den 1 november ${currentYear} betalade företaget en årsförsäkring på ${insuranceYearly.toLocaleString()} kr. Försäkringen gäller från 1 november ${currentYear} till 31 oktober År 2.`,
+    text: `Den 1 november ${currentYear} betalade företaget en årsförsäkring på ${insuranceYearly.toLocaleString('sv-SE')} kr. Försäkringen gäller från 1 november ${currentYear} till 31 oktober År 2.`,
     question: `Hur stor är försäkringskostnaden för ${currentYear}?`,
     answer: Math.round(insuranceMonthly * 2), // Nov + Dec
-    explanation: `Försäkringen har utnyttjats i 2 månader under År 1 (nov, dec).<br>Uträkning: (${insuranceYearly} / 12) × 2 = <strong>${Math.round(insuranceMonthly * 2).toLocaleString()} kr</strong>.`,
+    explanation: `Försäkringen har utnyttjats i 2 månader under År 1 (nov, dec).<br>Uträkning: (${insuranceYearly} / 12) × 2 = <strong>${Math.round(insuranceMonthly * 2).toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 3. ELRÄKNING (Upplupen kostnad)
@@ -43,10 +43,10 @@ function generateExercises() {
   const elecCost = (Math.floor(Math.random() * 50) + 20) * 100
   newExercises.push({
     title: 'Elförbrukning december',
-    text: `Elräkningen för december ${currentYear} på ${elecCost.toLocaleString()} kr kommer först i januari År 2.`,
+    text: `Elräkningen för december ${currentYear} på ${elecCost.toLocaleString('sv-SE')} kr kommer först i januari År 2.`,
     question: `Vilket belopp ska belasta resultatet för ${currentYear} avseende elen?`,
     answer: elecCost,
-    explanation: `Elförbrukningen skedde under december År 1. Enligt matchningsprincipen är detta en kostnad för År 1, även om fakturan kommer senare (Upplupen kostnad). Svar: <strong>${elecCost.toLocaleString()} kr</strong>.`,
+    explanation: `Elförbrukningen skedde under december År 1. Enligt matchningsprincipen är detta en kostnad för År 1, även om fakturan kommer senare (Upplupen kostnad). Svar: <strong>${elecCost.toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 4. LÅNERÄNTA (Upplupen kostnad)
@@ -56,10 +56,10 @@ function generateExercises() {
   const interestYearly = loanAmount * interestRate
   newExercises.push({
     title: 'Ränta på banklån',
-    text: `Företaget har ett lån på ${loanAmount.toLocaleString()} kr med 4% ränta. Räntan betalas årsvis i efterskott den 31 mars varje år.`,
+    text: `Företaget har ett lån på ${loanAmount.toLocaleString('sv-SE')} kr med 4% ränta. Räntan betalas årsvis i efterskott den 31 mars varje år.`,
     question: `Hur stor räntekostnad ska belasta År 1 (perioden 1 april – 31 december)?`,
     answer: interestYearly * (9 / 12),
-    explanation: `Vi måste kostnadsföra räntan för de månader som gått under året (april–december = 9 månader).<br>Uträkning: (${loanAmount} × 0,04) × (9/12) = <strong>${((interestYearly * 9) / 12).toLocaleString()} kr</strong>.`,
+    explanation: `Vi måste kostnadsföra räntan för de månader som gått under året (april–december = 9 månader).<br>Uträkning: (${loanAmount} × 0,04) × (9/12) = <strong>${((interestYearly * 9) / 12).toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 5. KUNDFAKTURA (Upplupen intäkt)
@@ -72,7 +72,7 @@ function generateExercises() {
     text: `Under december ${currentYear} arbetade konsulterna 50 timmar åt en kund (á ${hourlyRate} kr/h). Fakturering sker först i januari År 2.`,
     question: `Hur stor intäkt ska redovisas för ${currentYear}?`,
     answer: totalConsulting,
-    explanation: `Arbetet är utfört (presterat) under År 1. Därför ska intäkten tas upp nu som en upplupen intäkt.<br>Uträkning: 50 × ${hourlyRate} = <strong>${totalConsulting.toLocaleString()} kr</strong>.`,
+    explanation: `Arbetet är utfört (presterat) under År 1. Därför ska intäkten tas upp nu som en upplupen intäkt.<br>Uträkning: 50 × ${hourlyRate} = <strong>${totalConsulting.toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 6. ABONNEMANG (Förutbetald intäkt)
@@ -80,10 +80,10 @@ function generateExercises() {
   const subTotal = 24000
   newExercises.push({
     title: 'Sålt årsabonnemang',
-    text: `Vi säljer en mjukvarutjänst. En kund betalade ${subTotal.toLocaleString()} kr den 1 oktober ${currentYear} för ett års abonnemang (gäller 1 okt ${currentYear} – 30 sep År 2).`,
+    text: `Vi säljer en mjukvarutjänst. En kund betalade ${subTotal.toLocaleString('sv-SE')} kr den 1 oktober ${currentYear} för ett års abonnemang (gäller 1 okt ${currentYear} – 30 sep År 2).`,
     question: `Hur stor del av detta är en intäkt för ${currentYear}?`,
     answer: subTotal * (3 / 12),
-    explanation: `Vi har bara presterat tjänsten i 3 månader (okt, nov, dec) under År 1.<br>Uträkning: (${subTotal} / 12) × 3 = <strong>${((subTotal * 3) / 12).toLocaleString()} kr</strong>.`,
+    explanation: `Vi har bara presterat tjänsten i 3 månader (okt, nov, dec) under År 1.<br>Uträkning: (${subTotal} / 12) × 3 = <strong>${((subTotal * 3) / 12).toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 7. LEASING (Förutbetald kostnad - "Första förhöjda")
@@ -91,10 +91,10 @@ function generateExercises() {
   const leasingTotal = 60000
   newExercises.push({
     title: 'Leasingavgift (Förskott)',
-    text: `Den 1 december ${currentYear} betalade företaget leasingavgift för perioden december ${currentYear} till maj År 2 (6 månader). Totalt belopp: ${leasingTotal.toLocaleString()} kr.`,
+    text: `Den 1 december ${currentYear} betalade företaget leasingavgift för perioden december ${currentYear} till maj År 2 (6 månader). Totalt belopp: ${leasingTotal.toLocaleString('sv-SE')} kr.`,
     question: `Hur stor kostnad ska redovisas för ${currentYear}?`,
     answer: leasingTotal / 6, // Endast 1 månad (dec)
-    explanation: `Fakturan täcker 6 månader, men bara 1 månad (december) ligger på År 1.<br>Uträkning: ${leasingTotal} / 6 = <strong>${(leasingTotal / 6).toLocaleString()} kr</strong>.`,
+    explanation: `Fakturan täcker 6 månader, men bara 1 månad (december) ligger på År 1.<br>Uträkning: ${leasingTotal} / 6 = <strong>${(leasingTotal / 6).toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 8. LOKALHYRA (Intäkt - Vi hyr ut)
@@ -102,7 +102,7 @@ function generateExercises() {
   const rentIn = 15000
   newExercises.push({
     title: 'Uthyrning av lagerlokal',
-    text: `Vi hyr ut en del av vårt lager. Hyresgästen betalade ${(rentIn * 3).toLocaleString()} kr den 30 december ${currentYear} avseende hyra för kvartal 1 År 2.`,
+    text: `Vi hyr ut en del av vårt lager. Hyresgästen betalade ${(rentIn * 3).toLocaleString('sv-SE')} kr den 30 december ${currentYear} avseende hyra för kvartal 1 År 2.`,
     question: `Hur stor är hyresintäkten för ${currentYear}?`,
     answer: 0,
     explanation: `Hyran avser nästa år (jan-mars År 2). Prestationen har inte utförts än. Intäkten för År 1 är <strong>0 kr</strong>. Allt bokförs som förutbetald intäkt (skuld).`,
@@ -113,20 +113,20 @@ function generateExercises() {
   const bonus = 50000
   newExercises.push({
     title: 'Årsbonus till VD',
-    text: `Styrelsen beslutade i december ${currentYear} att VD ska få en bonus på ${bonus.toLocaleString()} kr för årets goda resultat. Utbetalning sker i februari År 2.`,
+    text: `Styrelsen beslutade i december ${currentYear} att VD ska få en bonus på ${bonus.toLocaleString('sv-SE')} kr för årets goda resultat. Utbetalning sker i februari År 2.`,
     question: `Vilket belopp ska belasta resultatet År 1?`,
     answer: bonus,
-    explanation: `Bonusen intjänades under År 1 och ska därför kostnadsföras då (Upplupen kostnad), även om utbetalningen sker senare. Svar: <strong>${bonus.toLocaleString()} kr</strong>.`,
+    explanation: `Bonusen intjänades under År 1 och ska därför kostnadsföras då (Upplupen kostnad), även om utbetalningen sker senare. Svar: <strong>${bonus.toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // 10. LICENS (Blandat)
   const licenseCost = 36000
   newExercises.push({
     title: 'IT-Licenser',
-    text: `Företaget betalade ${licenseCost.toLocaleString()} kr den 1 juli ${currentYear} för IT-licenser som gäller i 3 år framåt.`,
+    text: `Företaget betalade ${licenseCost.toLocaleString('sv-SE')} kr den 1 juli ${currentYear} för IT-licenser som gäller i 3 år framåt.`,
     question: `Hur stor är kostnaden för ${currentYear}?`,
     answer: (licenseCost / 36) * 6, // 36 månader totalt, 6 månader detta år
-    explanation: `Licensen gäller 36 månader (3 år). Under År 1 har vi utnyttjat 6 månader (juli-dec).<br>Månadskostnad: ${licenseCost}/36 = 1000 kr.<br>Kostnad År 1: 1000 × 6 = <strong>${((licenseCost / 36) * 6).toLocaleString()} kr</strong>.`,
+    explanation: `Licensen gäller 36 månader (3 år). Under År 1 har vi utnyttjat 6 månader (juli-dec).<br>Månadskostnad: ${licenseCost}/36 = 1000 kr.<br>Kostnad År 1: 1000 × 6 = <strong>${((licenseCost / 36) * 6).toLocaleString('sv-SE')} kr</strong>.`,
   })
 
   // Blanda uppgifterna varje gång

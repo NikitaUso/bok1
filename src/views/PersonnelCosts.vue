@@ -74,7 +74,7 @@ function generateExercises() {
     const socFees = Math.round(grossSalary * socRate)
 
     const text = `${company} ska betala ut lön för ${month}.
-                  Bruttolönen uppgår till ${grossSalary.toLocaleString()} kr.
+            Bruttolönen uppgår till ${grossSalary.toLocaleString('sv-SE')} kr.
                   Preliminärskatten är ${Math.round(taxRate * 100)}%.
                   Arbetsgivaravgifterna beräknas till 31%.
                   Bokför löneutbetalningen (via 1930) och kostnaderna.`
@@ -285,9 +285,9 @@ function skipExercise() {
 
       <!-- SUMMERING -->
       <div class="totals-row" v-if="userAccounts.length">
-        <span>Debet: {{ totalDebit.toLocaleString() }}</span>
+        <span>Debet: {{ totalDebit.toLocaleString('sv-SE') }}</span>
         <span class="separator">|</span>
-        <span>Kredit: {{ totalCredit.toLocaleString() }}</span>
+        <span>Kredit: {{ totalCredit.toLocaleString('sv-SE') }}</span>
       </div>
 
       <!-- KNAPPAR & FEEDBACK -->

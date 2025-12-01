@@ -162,7 +162,7 @@ function prevExercise() {
         <div class="data-box">
           <div class="data-row">
             <span>Anskaffningsvärde:</span>
-            <strong>{{ currentExercise.acquisition.toLocaleString() }} kr</strong>
+            <strong>{{ currentExercise.acquisition.toLocaleString('sv-SE') }} kr</strong>
           </div>
           <div class="data-row">
             <span>Ekonomisk livslängd:</span>
@@ -176,7 +176,9 @@ function prevExercise() {
             Företaget genomför en värdeprövning. Det fastställs att maskinens
             <strong>återvinningsvärde</strong> denna dag uppgår till:
           </p>
-          <div class="recoverable-value">{{ currentExercise.recoverable.toLocaleString() }} kr</div>
+          <div class="recoverable-value">
+            {{ currentExercise.recoverable.toLocaleString('sv-SE') }} kr
+          </div>
         </div>
 
         <p class="question-text">
@@ -249,14 +251,14 @@ function prevExercise() {
         </p>
         <p>
           Ursprunglig avskrivning per år: <br />
-          {{ currentExercise.acquisition.toLocaleString() }} / {{ currentExercise.lifeYears }} =
-          <strong>{{ currentExercise.annualDep.toLocaleString() }} kr/år</strong>
+          {{ currentExercise.acquisition.toLocaleString('sv-SE') }} /
+          {{ currentExercise.lifeYears }} =
+          <strong>{{ currentExercise.annualDep.toLocaleString('sv-SE') }} kr/år</strong>
         </p>
         <div class="step-math">
-          Bokfört värde (före test) = {{ currentExercise.acquisition.toLocaleString() }} - ({{
-            currentExercise.annualDep.toLocaleString()
-          }}
-          × {{ currentExercise.yearsOwned }}) =
+          Bokfört värde (före test) = {{ currentExercise.acquisition.toLocaleString('sv-SE') }} - ({
+          { currentExercise.annualDep.toLocaleString('sv-SE') } }}
+          <strong>{{ currentExercise.carryingBeforeTest.toLocaleString('sv-SE') }} kr</strong>
           <strong>{{ currentExercise.carryingBeforeTest.toLocaleString() }} kr</strong>
         </div>
       </div>
@@ -265,8 +267,8 @@ function prevExercise() {
       <div class="calc-step highlight-step">
         <span class="step-label">2. Jämför med återvinningsvärdet</span>
         <p>
-          Bokfört värde: {{ currentExercise.carryingBeforeTest.toLocaleString() }} kr <br />
-          Återvinningsvärde: {{ currentExercise.recoverable.toLocaleString() }} kr
+          Bokfört värde: {{ currentExercise.carryingBeforeTest.toLocaleString('sv-SE') }} kr <br />
+          Återvinningsvärde: {{ currentExercise.recoverable.toLocaleString('sv-SE') }} kr
         </p>
 
         <div v-if="currentExercise.impairment > 0" class="impairment-alert">
@@ -278,7 +280,7 @@ function prevExercise() {
           {{ currentExercise.recoverable }} = <strong>{{ currentExercise.impairment }} kr</strong>.
           <br />
           Nytt bokfört värde 2022-12-31:
-          <strong>{{ currentExercise.carryingAfterTest.toLocaleString() }} kr</strong>
+          <strong>{{ currentExercise.carryingAfterTest.toLocaleString('sv-SE') }} kr</strong>
         </div>
         <div v-else class="no-impairment-alert">
           ✅ Återvinningsvärdet är högre.
@@ -286,7 +288,7 @@ function prevExercise() {
           Ingen nedskrivning görs. Värdet behålls.
           <br />
           Bokfört värde 2022-12-31:
-          <strong>{{ currentExercise.carryingAfterTest.toLocaleString() }} kr</strong>
+          <strong>{{ currentExercise.carryingAfterTest.toLocaleString('sv-SE') }} kr</strong>
         </div>
       </div>
 
@@ -303,14 +305,14 @@ function prevExercise() {
           <strong>{{ currentExercise.remainingLifeAtTest }} år</strong>.
         </p>
         <p>
-          Ny avskrivning 2023 = {{ currentExercise.carryingAfterTest.toLocaleString() }} /
+          Ny avskrivning 2023 = {{ currentExercise.carryingAfterTest.toLocaleString('sv-SE') }} /
           {{ currentExercise.remainingLifeAtTest }} ≈
-          <strong>{{ Math.round(currentExercise.newAnnualDep).toLocaleString() }} kr</strong>
+          <strong>{{ Math.round(currentExercise.newAnnualDep).toLocaleString('sv-SE') }} kr</strong>
         </p>
         <div class="step-math final">
-          Värde 2023-12-31 = {{ currentExercise.carryingAfterTest.toLocaleString() }} -
-          {{ Math.round(currentExercise.newAnnualDep).toLocaleString() }} =
-          <strong>{{ currentExercise.correctAnswer.toLocaleString() }} kr</strong>
+          Värde 2023-12-31 = {{ currentExercise.carryingAfterTest.toLocaleString('sv-SE') }} -
+          {{ Math.round(currentExercise.newAnnualDep).toLocaleString('sv-SE') }} =
+          <strong>{{ currentExercise.correctAnswer.toLocaleString('sv-SE') }} kr</strong>
         </div>
       </div>
     </div>

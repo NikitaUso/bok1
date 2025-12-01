@@ -100,7 +100,7 @@ function generateExercises() {
 
     const text = `${scen.seller} skickade och bokförde den ${invDateStr} en faktura för en ${scen.item}
                   till ${scen.buyer}. Fakturan avser perioden ${pStartStr} till ${pEndStr} och beloppet är
-                  ${amount.toLocaleString()} kr. ${scen.buyer} betalar fakturan den ${payDateStr}.`
+                  ${amount.toLocaleString('sv-SE')} kr. ${scen.buyer} betalar fakturan den ${payDateStr}.`
 
     // --- RÄKNA UT FACIT ---
 
@@ -306,21 +306,21 @@ function prevExercise() {
         <ul>
           <li>
             <strong>a, b, d, e (Kassaflöde/Faktura):</strong>
-            {{ currentExercise.amount.toLocaleString() }} kr. <br /><span class="detail"
+            {{ currentExercise.amount.toLocaleString('sv-SE') }} kr. <br /><span class="detail"
               >Hela beloppet bokförs som Inkomst/Utgift vid fakturadatumet och
               Inbetalning/Utbetalning vid betalningsdatumet.</span
             >
           </li>
           <li class="calc-item">
             <strong>c, f (Periodiserat för År 1):</strong>
-            {{ currentExercise.periodizedAmount.toLocaleString() }} kr.
+            {{ currentExercise.periodizedAmount.toLocaleString('sv-SE') }} kr.
             <br />
             <div class="calc-box">
               Perioden i År 1 är <strong>{{ currentExercise.monthsInYear1 }} månader</strong>.
               <br />
-              Uträkning: ({{ currentExercise.amount.toLocaleString() }} kr / 12 mån) ×
+              Uträkning: ({{ currentExercise.amount.toLocaleString('sv-SE') }} kr / 12 mån) ×
               {{ currentExercise.monthsInYear1 }} mån =
-              <strong>{{ currentExercise.periodizedAmount.toLocaleString() }} kr</strong>.
+              <strong>{{ currentExercise.periodizedAmount.toLocaleString('sv-SE') }} kr</strong>.
             </div>
           </li>
         </ul>

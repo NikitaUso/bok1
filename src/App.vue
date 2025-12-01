@@ -1,24 +1,5 @@
 <script setup>
-import { computed } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
-
-const route = useRoute()
-
-// Räknar ut vad som ska stå i mitten baserat på vilken sida vi är på
-const pageTitle = computed(() => {
-  switch (route.name) {
-    case 'flashcards':
-      return 'Flashcards'
-    case 'two':
-      return 'T-konton' // Vi kan döpa om dessa routes senare
-    case 'three':
-      return 'Quiz'
-    case 'four':
-      return 'Rapporter & analyser'
-    default:
-      return 'AI'
-  }
-})
+import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
@@ -28,13 +9,29 @@ const pageTitle = computed(() => {
         <div class="logo">Extern redovisning 🎓</div>
       </div>
 
-      <div class="center-title">{{ pageTitle }}</div>
+      <!-- Center title removed: only nav links are shown in header -->
       <nav>
         <RouterLink to="/">Flashcards</RouterLink>
         <RouterLink to="/tva">T-konton</RouterLink>
         <RouterLink to="/tre">Quiz</RouterLink>
         <RouterLink to="/fyra">Räkna på rapporter och analyser</RouterLink>
         <RouterLink to="/ai">AI-Skapare</RouterLink>
+
+        <div class="dropdown" aria-haspopup="true">
+          <a class="drop-btn">Extra ▾</a>
+          <div class="dropdown-menu" role="menu">
+            <RouterLink class="dropdown-item" to="/extra/atervinningsvarde"
+              >Återvinningsvärde</RouterLink
+            >
+            <RouterLink class="dropdown-item" to="/extra/utgifter">Utgifter</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/r_syss">R_syss</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/personalkostnader"
+              >Personalkostnader</RouterLink
+            >
+            <RouterLink class="dropdown-item" to="/extra/vaxelkurser">Växelkurser</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/periodisering">Periodisering</RouterLink>
+          </div>
+        </div>
       </nav>
     </header>
 
@@ -121,6 +118,45 @@ nav a {
 
 nav a:hover {
   color: white;
+}
+/* Extra dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.drop-btn {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: default;
+  padding: 4px 6px;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #2c3e50;
+  border-radius: 6px;
+  padding: 6px 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  min-width: 200px;
+  z-index: 200;
+}
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: #bdc3c7;
+  text-decoration: none;
+  font-weight: 600;
+}
+.dropdown-item:hover {
+  background: #34495e;
+  color: #fff;
+}
+.dropdown:hover .dropdown-menu {
+  display: block;
 }
 nav a.router-link-active {
   color: #42b883;

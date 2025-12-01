@@ -25,49 +25,53 @@ function generateExercises() {
     const year = 2024
 
     // 1. Ingående lager (1/1)
-    const ibQty = (Math.floor(Math.random() * 50) + 20) * 100 // 2000 - 7000 st
-    const ibPrice = Math.floor(Math.random() * 50) + 50 // 50 - 100 kr
+    // Kvantitet: 2000-7000 st, Pris: 50-150 kr
+    const ibQty = (Math.floor(Math.random() * 50) + 20) * 100
+    const ibPrice = Math.floor(Math.random() * 100) + 50
     const ibValue = ibQty * ibPrice
 
     // 2. Inköp 1 (Vår)
     const buy1Qty = (Math.floor(Math.random() * 40) + 20) * 100
-    const buy1Price = ibPrice + Math.floor(Math.random() * 10) - 5 // Lite prisvariation
+    const buy1Price = ibPrice + Math.floor(Math.random() * 20) - 10 // Prisvariation
     const buy1Value = buy1Qty * buy1Price
     const buy1Date = '15 april'
 
     // 3. Inköp 2 (Höst)
     const buy2Qty = (Math.floor(Math.random() * 40) + 20) * 100
-    const buy2Price = buy1Price + Math.floor(Math.random() * 15) - 5
+    const buy2Price = buy1Price + Math.floor(Math.random() * 20) - 5
     const buy2Value = buy2Qty * buy2Price
     const buy2Date = '19 oktober'
 
-    // Totalt tillgängligt
+    // Totalt tillgängligt för försäljning (Kostnad)
     const totalQty = ibQty + buy1Qty + buy2Qty
     const totalAcqValue = ibValue + buy1Value + buy2Value
 
-    // 4. Utgående lager (31/12)
-    // Måste vara mindre än totalt antal. Låt oss säga ca 30-50% finns kvar.
-    const ubQty = Math.round((totalQty * (0.3 + Math.random() * 0.2)) / 100) * 100
+    // 4. Utgående lager (31/12) - Kvantitet
+    // Vi antar att ca 20-40% av varorna finns kvar
+    const ubQty = Math.round((totalQty * (0.2 + Math.random() * 0.2)) / 100) * 100
 
-    // 5. Nettoförsäljningsvärde 31/12
-    // Ibland lägre än senaste inköpspris (nedskrivning), ibland högre
-    const netSalesPrice = buy2Price + Math.floor(Math.random() * 20) - 10
+    // 5. Nettoförsäljningsvärde 31/12 (Marknadsvärde)
+    // Slumpa så att det ibland är lägre än anskaffningspriset (LVP-nedskrivning krävs)
+    // och ibland högre (ingen nedskrivning).
+    const netSalesPrice = buy2Price + Math.floor(Math.random() * 30) - 15
 
     // --- LÖSNING (FACIT) ---
 
-    // Steg A: Beräkna värdet på UB enligt FIFU och LVP
-    // FIFU: De varor som finns kvar är de som köptes sist.
-    // Vi måste "fylla" ubQty bakifrån.
+    // Steg A: Värdera UB enligt FIFU och LVP
+    // FIFU: De varor som finns kvar i lagret är de som köptes SIST.
+    // Vi "plockar" varor bakifrån (från Inköp 2, sen Inköp 1, sen IB) tills vi fyllt ubQty.
 
     let remainingToFill = ubQty
     let ubValue = 0
     const ubBreakdown = [] // För förklaringen
 
-    // Kolla Inköp 2 (Sist in)
+    // 1. Kolla Inköp 2 (Nyast)
     if (remainingToFill > 0) {
       const takeFrom2 = Math.min(remainingToFill, buy2Qty)
-      // LVP: Jämför anskaffningsvärde med nettoförsäljningsvärde
+      // LVP: Välj lägsta av anskaffningspris och nettoförsäljningsvärde
       const valPrice = Math.min(buy2Price, netSalesPrice)
+      const isWriteDown = valPrice < buy2Price
+
       ubValue += takeFrom2 * valPrice
 
       ubBreakdown.push({
@@ -77,14 +81,17 @@ function generateExercises() {
         net: netSalesPrice,
         used: valPrice,
         sum: takeFrom2 * valPrice,
+        note: isWriteDown ? 'Nedskrivning (LVP)' : 'Anskaffningsvärde',
       })
       remainingToFill -= takeFrom2
     }
 
-    // Kolla Inköp 1
+    // 2. Kolla Inköp 1
     if (remainingToFill > 0) {
       const takeFrom1 = Math.min(remainingToFill, buy1Qty)
       const valPrice = Math.min(buy1Price, netSalesPrice)
+      const isWriteDown = valPrice < buy1Price
+
       ubValue += takeFrom1 * valPrice
 
       ubBreakdown.push({
@@ -94,14 +101,17 @@ function generateExercises() {
         net: netSalesPrice,
         used: valPrice,
         sum: takeFrom1 * valPrice,
+        note: isWriteDown ? 'Nedskrivning (LVP)' : 'Anskaffningsvärde',
       })
       remainingToFill -= takeFrom1
     }
 
-    // Kolla IB (Ovanligt att man går så långt bak, men möjligt)
+    // 3. Kolla IB (Om vi har extremt mycket lager kvar)
     if (remainingToFill > 0) {
       const takeFromIB = Math.min(remainingToFill, ibQty)
       const valPrice = Math.min(ibPrice, netSalesPrice)
+      const isWriteDown = valPrice < ibPrice
+
       ubValue += takeFromIB * valPrice
 
       ubBreakdown.push({
@@ -111,17 +121,17 @@ function generateExercises() {
         net: netSalesPrice,
         used: valPrice,
         sum: takeFromIB * valPrice,
+        note: isWriteDown ? 'Nedskrivning (LVP)' : 'Anskaffningsvärde',
       })
       remainingToFill -= takeFromIB
     }
 
     // Steg B: Beräkna KSV
-    // KSV = (IB + Inköp) - UB
-    // Eller: Kostnad för tillgängliga varor - Värde på outnyttjade varor
-    const ksv = totalAcqValue - ubValue
+    // KSV = (Kostnad för alla tillgängliga varor) - (Värdet på det som är kvar)
+    const ksvRaw = totalAcqValue - ubValue
 
-    // Svaret ska vara i tkr, heltal
-    const correctAnswer = Math.round(ksv / 1000)
+    // Svaret ska vara i tkr, heltal (avrundat)
+    const correctAnswer = Math.round(ksvRaw / 1000)
 
     newExercises.push({
       id: i + 1,
@@ -138,7 +148,7 @@ function generateExercises() {
         totalAcqValue,
         ubValue,
         ubBreakdown,
-        ksvRaw: ksv,
+        ksvRaw,
         correctAnswer,
       },
     })
@@ -169,10 +179,10 @@ function checkAnswer() {
   // Tillåt +/- 1 tkr felmarginal
   if (Math.abs(userInt - correct) <= 1) {
     status.value = 'correct'
-    showSolution.value = true
+    showSolution.value = true // Visa lösning direkt vid rätt svar
   } else {
     status.value = 'wrong'
-    showSolution.value = false
+    showSolution.value = false // Dölj lösning vid fel svar
   }
 }
 
@@ -193,7 +203,7 @@ function prevExercise() {
 
 <template>
   <div class="wrapper">
-    <h1>Övning: KSV & Lagervärdering</h1>
+    <h1>Övning: KSV, FIFU & LVP</h1>
 
     <div class="card" v-if="currentExercise.id">
       <div class="header-row">
@@ -214,7 +224,7 @@ function prevExercise() {
               <td>{{ currentExercise.data.ib.qty }} st</td>
               <td>à {{ currentExercise.data.ib.price }} kr/st</td>
               <td class="sum">
-                = {{ Math.round(currentExercise.data.ib.total / 1000).toLocaleString('sv-SE') }} tkr
+                = {{ (currentExercise.data.ib.total / 1000).toLocaleString() }} tkr
               </td>
             </tr>
             <tr>
@@ -222,8 +232,7 @@ function prevExercise() {
               <td>{{ currentExercise.data.buy1.qty }} st</td>
               <td>à {{ currentExercise.data.buy1.price }} kr/st</td>
               <td class="sum">
-                =
-                {{ Math.round(currentExercise.data.buy1.total / 1000).toLocaleString('sv-SE') }} tkr
+                = {{ (currentExercise.data.buy1.total / 1000).toLocaleString() }} tkr
               </td>
             </tr>
             <tr>
@@ -231,8 +240,7 @@ function prevExercise() {
               <td>{{ currentExercise.data.buy2.qty }} st</td>
               <td>à {{ currentExercise.data.buy2.price }} kr/st</td>
               <td class="sum">
-                =
-                {{ Math.round(currentExercise.data.buy2.total / 1000).toLocaleString('sv-SE') }} tkr
+                = {{ (currentExercise.data.buy2.total / 1000).toLocaleString() }} tkr
               </td>
             </tr>
             <tr class="ub-row">
@@ -246,17 +254,20 @@ function prevExercise() {
           </table>
         </div>
 
-        <p class="info-text">
-          Nettoförsäljningsvärdet per styck den 31/12 uppgick till
-          <strong>{{ currentExercise.data.netSalesPrice }} kr/st</strong>.
-          <br />
-          Vid lagervärdering tillämpar företaget <em>lägsta värdets princip (LVP)</em> och
-          flödesantagandet <em>FIFU</em> (först in, först ut).
-        </p>
+        <div class="info-text">
+          <p>
+            Nettoförsäljningsvärdet per styck den 31/12 uppgick till
+            <strong>{{ currentExercise.data.netSalesPrice }} kr/st</strong>.
+          </p>
+          <p>
+            Vid lagervärdering tillämpar företaget <em>lägsta värdets princip (LVP)</em> och
+            flödesantagandet <em>FIFU</em> (först in, först ut).
+          </p>
+        </div>
 
         <p class="question">
           Ange storleken för <strong>kostnad sålda varor (KSV)</strong> under perioden. <br /><small
-            >(Bortse från eventuella schablonmässiga inkuransavdrag).</small
+            >(Svara i tkr, heltal. Bortse från eventuella schablonmässiga inkuransavdrag).</small
           >
         </p>
       </div>
@@ -278,9 +289,10 @@ function prevExercise() {
         </div>
 
         <div v-if="status !== 'unanswered'" class="feedback-area">
-          <span :class="['msg', status]">
-            {{ status === 'correct' ? 'Rätt svar! 🎉' : 'Fel svar.' }}
-          </span>
+          <div :class="['msg', status]">
+            {{ status === 'correct' ? 'Rätt svar! 🎉' : 'Fel svar. Försök igen!' }}
+          </div>
+
           <button
             v-if="status === 'wrong' && !showSolution"
             @click="showSolution = true"
@@ -298,15 +310,12 @@ function prevExercise() {
         <div class="step">
           <strong>1. Beräkna totalt värde av tillgängliga varor (IB + Inköp)</strong>
           <p>
-            {{ Math.round(currentExercise.data.ib.total / 1000).toLocaleString('sv-SE') }} +
-            {{ Math.round(currentExercise.data.buy1.total / 1000).toLocaleString('sv-SE') }} +
-            {{ Math.round(currentExercise.data.buy2.total / 1000).toLocaleString('sv-SE') }}
+            {{ (currentExercise.data.ib.total / 1000).toLocaleString() }} +
+            {{ (currentExercise.data.buy1.total / 1000).toLocaleString() }} +
+            {{ (currentExercise.data.buy2.total / 1000).toLocaleString() }}
             =
             <strong
-              >{{
-                Math.round(currentExercise.solution.totalAcqValue / 1000).toLocaleString('sv-SE')
-              }}
-              tkr</strong
+              >{{ (currentExercise.solution.totalAcqValue / 1000).toLocaleString() }} tkr</strong
             >
           </p>
         </div>
@@ -314,8 +323,10 @@ function prevExercise() {
         <div class="step">
           <strong>2. Värdera Utgående Lager (UB) - {{ currentExercise.data.ubQty }} st</strong>
           <p>
-            Enligt FIFU finns de <em>senast köpta</em> varorna kvar. Enligt LVP väljer vi lägsta av
-            anskaffningsvärde och nettoförsäljningsvärde ({{ currentExercise.data.netSalesPrice }}
+            Enligt FIFU består lagret av de <em>senast köpta</em> varorna. Enligt LVP väljer vi det
+            lägsta av anskaffningsvärde och nettoförsäljningsvärde ({{
+              currentExercise.data.netSalesPrice
+            }}
             kr).
           </p>
 
@@ -324,31 +335,29 @@ function prevExercise() {
               <span class="batch-source">{{ batch.source }}:</span>
               {{ batch.qty }} st × min({{ batch.acq }}, {{ batch.net }}) = {{ batch.qty }} ×
               <strong>{{ batch.used }}</strong> kr =
-              <span>{{ Math.round(batch.sum).toLocaleString('sv-SE') }} kr</span>
+              <span>{{ Math.round(batch.sum).toLocaleString() }} kr</span>
+              <span class="note">({{ batch.note }})</span>
             </li>
           </ul>
           <p class="sub-total">
             Totalt UB-värde:
-            <strong
-              >{{
-                Math.round(currentExercise.solution.ubValue / 1000).toLocaleString('sv-SE')
-              }}
-              tkr</strong
-            >
+            <strong>{{ Math.round(currentExercise.solution.ubValue).toLocaleString() }} kr</strong>
+            (ca {{ Math.round(currentExercise.solution.ubValue / 1000).toLocaleString() }} tkr)
           </p>
         </div>
 
         <div class="step final">
           <strong>3. Beräkna KSV</strong>
-          <p>KSV = (IB + Inköp) - UB</p>
-          <p>
+          <p>KSV = (Totala varukostnader) - (Värdet på UB)</p>
+          <p class="math-calc">
+            {{ (currentExercise.solution.totalAcqValue / 1000).toLocaleString() }} tkr -
             {{
-              Math.round(currentExercise.solution.totalAcqValue / 1000).toLocaleString('sv-SE')
+              (currentExercise.solution.ubValue / 1000).toLocaleString(undefined, {
+                maximumFractionDigits: 1,
+              })
             }}
-            - {{ Math.round(currentExercise.solution.ubValue / 1000).toLocaleString('sv-SE') }} =
-            <strong
-              >{{ currentExercise.solution.correctAnswer.toLocaleString('sv-SE') }} tkr</strong
-            >
+            tkr =
+            <strong>{{ currentExercise.solution.correctAnswer.toLocaleString() }} tkr</strong>
           </p>
         </div>
       </div>
@@ -409,7 +418,7 @@ h1 {
 }
 
 .reload-btn {
-  display: none; /* Dölj slumpaknappen */
+  display: none; /* Dölj slumpaknappen enligt önskemål */
 }
 
 .scenario-box {
@@ -495,26 +504,36 @@ input:focus {
 
 .feedback-area {
   margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 .msg {
   font-weight: bold;
-  margin-right: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  text-align: center;
 }
 .msg.correct {
-  color: #27ae60;
+  background-color: #d4edda;
+  color: #155724;
 }
 .msg.wrong {
-  color: #c0392b;
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
 .show-btn {
-  background: #e67e22;
+  background: #f39c12;
   color: white;
   padding: 8px 20px;
   font-size: 0.9rem;
+  align-self: center;
 }
 .show-btn:hover {
-  background: #d35400;
+  background: #e67e22;
 }
 
 .solution-card {
@@ -524,6 +543,7 @@ input:focus {
   border-radius: 8px;
   padding: 20px;
   animation: fadeIn 0.5s;
+  border-left: 5px solid #27ae60;
 }
 
 .step {
@@ -547,12 +567,18 @@ input:focus {
   margin-bottom: 5px;
   border-radius: 4px;
   font-family: monospace;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .batch-source {
   font-weight: bold;
   color: #555;
-  display: inline-block;
-  width: 120px;
+}
+.note {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
 }
 
 .final {
@@ -560,6 +586,11 @@ input:focus {
   border: 1px solid #c8e6c9;
   padding: 15px;
   border-radius: 5px;
+}
+.math-calc {
+  font-family: monospace;
+  font-size: 1.2rem;
+  margin-top: 5px;
 }
 
 .nav-row {

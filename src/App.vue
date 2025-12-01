@@ -23,7 +23,10 @@ import { RouterLink, RouterView } from 'vue-router'
             <RouterLink class="dropdown-item" to="/extra/atervinningsvarde"
               >Återvinningsvärde</RouterLink
             >
-            <RouterLink class="dropdown-item" to="/extra/utgifter">Utgifter</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/utgifter">Bokslutstablå</RouterLink>
+            <RouterLink class="dropdown-item" to="/extra/utgifter-ny"
+              >Utgifter (under konstruktion)</RouterLink
+            >
             <RouterLink class="dropdown-item" to="/extra/r_syss">R_syss</RouterLink>
             <RouterLink class="dropdown-item" to="/extra/personalkostnader"
               >Personalkostnader</RouterLink

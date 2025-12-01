@@ -8,6 +8,7 @@ import RecoveryValue from '@/views/RecoveryValue.vue'
 import ExchangeRates from '@/views/ExchangeRates.vue'
 import RSyss from '@/views/RSyss.vue'
 import Expenses from '@/views/Expenses.vue'
+import ExpensesNew from '@/views/ExpensesNew.vue'
 import PersonnelCosts from '@/views/PersonnelCosts.vue'
 import Accruals from '@/views/Accruals.vue'
 import NetRealizableValue from '@/views/NetRealizableValue.vue'
@@ -59,6 +60,11 @@ const router = createRouter({
       path: '/extra/utgifter',
       name: 'expenses',
       component: Expenses,
+    },
+    {
+      path: '/extra/utgifter-ny',
+      name: 'expenses-new',
+      component: ExpensesNew,
     },
     {
       path: '/extra/personalkostnader',

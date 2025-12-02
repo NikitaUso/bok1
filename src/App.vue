@@ -38,6 +38,20 @@ import { RouterLink, RouterView } from 'vue-router'
             >
           </div>
         </div>
+        <div class="dropdown" aria-haspopup="true">
+          <a class="drop-btn">Slutspurten ▾</a>
+          <div class="dropdown-menu" role="menu">
+            <RouterLink class="dropdown-item" to="/slutspurten/bruttomarginal"
+              >Bruttomarginal / Bruttoresultat</RouterLink
+            >
+            <RouterLink class="dropdown-item" to="/slutspurten/rat-totalt-kapital"
+              >Räntabilitet på totalt kapital</RouterLink
+            >
+            <RouterLink class="dropdown-item" to="/slutspurten/personalkostnader"
+              >Personalkostnader</RouterLink
+            >
+          </div>
+        </div>
       </nav>
     </header>
 

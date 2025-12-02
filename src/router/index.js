@@ -12,6 +12,9 @@ import ExpensesNew from '@/views/ExpensesNew.vue'
 import PersonnelCosts from '@/views/PersonnelCosts.vue'
 import Accruals from '@/views/Accruals.vue'
 import NetRealizableValue from '@/views/NetRealizableValue.vue'
+import BruttomarginalView from '@/views/BruttomarginalView.vue'
+import RatTotKapView from '@/views/RatTotKapView.vue'
+import PersonalkostnaderSpurtView from '@/views/PersonalkostnaderSpurtView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,6 +83,21 @@ const router = createRouter({
       path: '/extra/nettoforsaljningsvarde',
       name: 'net-realizable',
       component: NetRealizableValue,
+    },
+    {
+      path: '/slutspurten/bruttomarginal',
+      name: 'slut-bruttomarginal',
+      component: BruttomarginalView,
+    },
+    {
+      path: '/slutspurten/rat-totalt-kapital',
+      name: 'slut-rattotkap',
+      component: RatTotKapView,
+    },
+    {
+      path: '/slutspurten/personalkostnader',
+      name: 'slut-personalkostnader',
+      component: PersonalkostnaderSpurtView,
     },
   ],
 })

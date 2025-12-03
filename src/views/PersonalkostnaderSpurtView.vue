@@ -37,9 +37,18 @@
     <div class="calculator-section">
       <h3>Testa med egna siffror</h3>
 
+      <div class="mode-row">
+        <label for="inputMode">Utgå från:</label>
+        <select id="inputMode" v-model="inputMode">
+          <option value="brutto">Bruttolön</option>
+          <option value="netto">Nettolön</option>
+        </select>
+      </div>
+
       <div class="input-wrapper">
-        <label>Ange Bruttolön (kr):</label>
-        <input type="number" v-model.number="bruttolon" step="1000" />
+        <label v-if="inputMode === 'brutto'">Ange Bruttolön (kr):</label>
+        <label v-else>Ange Nettolön (kr):</label>
+        <input type="number" v-model.number="inputAmount" step="1000" />
       </div>
 
       <div class="result-grid">
@@ -96,7 +105,8 @@
 import { ref, computed } from 'vue'
 
 // --- State ---
-const bruttolon = ref(30000)
+const inputMode = ref('brutto') // 'brutto' | 'netto'
+const inputAmount = ref(30000)
 const activeMode = ref('total') // 'total', 'brutto', 'netto', 'skatt', 'ag'
 
 // --- Konstanter ---
@@ -175,8 +185,13 @@ const setEquationTarget = (mode) => {
 }
 
 // --- Beräkning av värden ---
+const bruttoBase = computed(() => {
+  const amount = inputAmount.value || 0
+  return inputMode.value === 'brutto' ? amount : amount / FACTORS.netto
+})
+
 const values = computed(() => {
-  const b = bruttolon.value || 0
+  const b = bruttoBase.value || 0
   return {
     brutto: b,
     skatt: b * FACTORS.skatt,
@@ -301,6 +316,18 @@ const formatCurrency = (val) => {
   background: #f8fafc;
   padding: 30px;
   border-radius: 12px;
+}
+
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.mode-row select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
 }
 
 .input-wrapper {

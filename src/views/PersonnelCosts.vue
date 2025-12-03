@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 // --- KONTOPLAN ---
 const accountList = [
@@ -18,6 +18,9 @@ const userAccounts = ref([]) // Användarens T-konton
 const selectedAccountCode = ref('')
 const status = ref('unanswered') // 'unanswered', 'correct', 'wrong'
 const feedbackMessage = ref('')
+
+// Brutto/Netto-läge
+const baseMode = ref('brutto') // 'brutto' | 'netto'
 
 // Historik för att spara svar när man bläddrar
 const history = ref({})
@@ -73,8 +76,15 @@ function generateExercises() {
     const socRate = 0.31
     const socFees = Math.round(grossSalary * socRate)
 
-    const text = `${company} ska betala ut lön för ${month}.
+    const text =
+      baseMode.value === 'brutto'
+        ? `${company} ska betala ut lön för ${month}.
             Bruttolönen uppgår till ${grossSalary.toLocaleString('sv-SE')} kr.
+                  Preliminärskatten är ${Math.round(taxRate * 100)}%.
+                  Arbetsgivaravgifterna beräknas till 31%.
+                  Bokför löneutbetalningen (via 1930) och kostnaderna.`
+        : `${company} ska betala ut lön för ${month}.
+            Nettolönen uppgår till ${exactNet.toLocaleString('sv-SE')} kr.
                   Preliminärskatten är ${Math.round(taxRate * 100)}%.
                   Arbetsgivaravgifterna beräknas till 31%.
                   Bokför löneutbetalningen (via 1930) och kostnaderna.`
@@ -102,6 +112,11 @@ function generateExercises() {
 }
 
 onMounted(generateExercises)
+
+// Regenerera uppgifter när läget ändras
+watch(baseMode, () => {
+  generateExercises()
+})
 
 // --- LOGIK ---
 const currentExercise = computed(() => exercises.value[currentIndex.value] || {})
@@ -236,7 +251,13 @@ function skipExercise() {
     <div class="scenario-card" v-if="currentExercise.id">
       <div class="header-row">
         <h2>Uppgift {{ currentIndex + 1 }} / 10: {{ currentExercise.title }}</h2>
-        <button @click="generateExercises" class="reload-btn" v-if="false">🔄 Slumpa nya</button>
+        <div class="mode-switch">
+          <label for="modeSelect">Utgå från:</label>
+          <select id="modeSelect" v-model="baseMode">
+            <option value="brutto">Bruttolön</option>
+            <option value="netto">Nettolön</option>
+          </select>
+        </div>
       </div>
       <p class="scenario-text">{{ currentExercise.text }}</p>
     </div>
@@ -357,6 +378,17 @@ function skipExercise() {
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mode-switch select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
 .scenario-text {
